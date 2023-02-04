@@ -1,12 +1,49 @@
-from fastapi import FastAPI
+from fastapi import FastAPI,Depends
 from starlette.templating import Jinja2Templates 
 from starlette.requests import Request
 from fastapi.staticfiles import StaticFiles
-import schemas
 import json
+import random
+import sqlite3
+import schemas
 
 
 app = FastAPI()
+
+dbname = 'item_data.db'
+
+
+
+def get_name_and_image(index:int):
+    conn = sqlite3.connect(dbname)
+    cur = conn.cursor()
+    cur.execute(f'SELECT * FROM name_pic WHERE "index" = {index}')
+    list = [row for row in cur]
+    cur.close()
+    conn.close()
+    return list
+
+def get_reviews(id :str):
+    conn = sqlite3.connect(dbname)
+    cur = conn.cursor()
+    cur.execute(f'SELECT * FROM review WHERE "id" LIKE "{id}"')
+    list = [row for row in cur]
+    cur.close()
+    conn.close()
+    return list
+
+
+
+
+def rand_ints_nodup(a : int, b : int, k : int = 4):#重複しないランダム数字を4つ作成
+  ns = []
+  while len(ns) < k:
+    n = random.randint(a, b)
+    if not n in ns:
+      ns.append(n)
+  return ns
+
+
 
 templates = Jinja2Templates(directory="templates")
 
@@ -14,9 +51,14 @@ app.mount(
     '/templates/static', 
     StaticFiles(directory="templates/static"), 
     name='static'
-    )
+)
 
 @app.get("/")
+async def index(request:Request):
+    return templates.TemplateResponse("start_screen.html",{"request":request})
+
+
+@app.get("/index.html")
 async def index(request:Request):
     return templates.TemplateResponse("index.html",{"request":request})
 
@@ -24,28 +66,25 @@ async def index(request:Request):
 
 
 @app.get("/quiz_data",response_model=schemas.QuizData)
-async def fetch_quiz_data():
-    smp_itme = schemas.Item(
-        id="i302108",
-        name="イヤホン",
-        image_path= "https://image.rakuten.co.jp/livelylife/cabinet/i/i302108.jpg",
-        reviews=["娘が使用するのに購入しました。とくに問題なく使用できています。商品の発送も早くて良かったです　",
-                 "注文してわずか数日で手元に届きました。迅速なご対応、ありがとうございました。",
-                 "お値段以上に 音が良いです！",
-                 "娘が使用しています。リーズナブルで、使いやすいです。",
-                 "初めてのイヤホン購入でしたが、音質も良く、音ズレもなくとても快適に使用出来てます！お値段以上でした！",
-                 "すぐに届きました！タッチパネル操作が少し不安ですが、使ってみようと思います。",
-                 "コンパクトでかわいい色でした！通学で音楽を楽しみたいです。",
-                 "すぐに届きました。気に入って頂きました。コスパが良く気に入っています。",
-                 "注文してわずか数日で手元に届きました。迅速なご対応、ありがとうございました。",
-                 "初めてのワイヤレスイヤホン購入でしたが、問題なく使用できました。お値段も安くて助かります。"
-                ]
+async def provide_quiz_data():
+    index_list = rand_ints_nodup(0,3)
+    item_list = []
+    for index in index_list:
+        name_and_image = get_name_and_image(index)
+        id = name_and_image[0][1]
+        reviewData = get_reviews(id)
+        item = schemas.Item(
+            id = id,
+            name = name_and_image[0][2],
+            image_path = name_and_image[0][3],
+            reviews = [review[2] for review in reviewData]
+        )
+        item_list.append(item)
+        
+    
+    data = schemas.QuizData(
+        items=item_list,
+        correct_ans_index=random.randint(0, 3)
     )
     
-    smp_data = schemas.QuizData(
-        items=[smp_itme],
-        correct_ans_index=0
-    )
-    
-    
-    return smp_data
+    return data

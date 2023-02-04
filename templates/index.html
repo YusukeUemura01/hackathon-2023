@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}">
 </head>
 <body>
+    <div class="card">
+        <div id="question">このレビューはどの商品のレビューでしょうか？</div>
+    </div>
     <div class="comment">
         <div></div>
         <div></div>
@@ -21,13 +24,13 @@
         <div></div>
     </div>
     <div>
+        <button class="button-80">ans0</button>
         <button class="button-80">ans1</button>
         <button class="button-80">ans2</button>
-    </div>
-    <div>
         <button class="button-80">ans3</button>
-        <button class="button-80">ans4</button>
     </div>
     <script src="{{ url_for('static', path='/game.js') }}"></script>
+    
+    
 </body>
 </html>
