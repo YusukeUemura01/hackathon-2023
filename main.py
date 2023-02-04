@@ -26,7 +26,7 @@ def get_name_and_image(index:int):
 def get_reviews(id :str):
     conn = sqlite3.connect(dbname)
     cur = conn.cursor()
-    cur.execute(f'SELECT * FROM review WHERE "id" LIKE "{id}"')
+    cur.execute("SELECT * FROM review WHERE id like ?",('%'+id+'%',))
     list = [row for row in cur]
     cur.close()
     conn.close()

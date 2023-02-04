@@ -22,15 +22,20 @@ async function setItemData(){
     currentQuestionNum++;
 
     const data = await fetchItemData();
+    ansIndex = data.correct_ans_index;
 
     for(let i=0; i < $comments.length; i++){
-        $comments[i].textContent = data.items[0].reviews[i];
+        $comments[i].textContent = data.items[ansIndex].reviews[i];
     }
 
-    ansIndex = data.correct_ans_index;
 
     $question.textContent = "問題"+currentQuestionNum + "このレビューはどの商品のレビューでしょうか？";
 }
+
+
+
+
+setItemData();
 
 
 
