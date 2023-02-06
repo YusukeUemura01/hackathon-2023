@@ -7,7 +7,6 @@ import random
 import sqlite3
 import schemas
 
-
 app = FastAPI()
 
 dbname = 'item_data.db'
@@ -47,11 +46,16 @@ def rand_ints_nodup(a : int, b : int, k : int = 4):#重複しないランダム�
 
 templates = Jinja2Templates(directory="templates")
 
+
+
+
 app.mount(
     '/templates/static', 
     StaticFiles(directory="templates/static"), 
     name='static'
 )
+
+
 
 @app.get("/")
 async def index(request:Request):
