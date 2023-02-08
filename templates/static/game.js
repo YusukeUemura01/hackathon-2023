@@ -141,11 +141,27 @@ function runComment() {
 }
 
 
+function endGame(){
+    url = `http://127.0.0.1:8000/result?time=${passedTime}&correctNum=${correctAnsNum}`
+    window.location.replace(url);
+}
+
+
 
 function showDialog(id) {
     document.getElementById(id).style.display = "block";
     setTimeout(async function(){
-        id === "correct" ? window.alert("正解！次に進みます") : window.alert(`残念！正解は${itemData.items[ansIndex].name}！ 次に進みます`)
+
+        if(currentQuestionNum === 5){
+            id === "correct" 
+            ? window.alert("正解！ゲームを終了します。") 
+            : window.alert(`残念！正解は${itemData.items[ansIndex].name}！ ゲームを終了します。`)
+            endGame();
+            return;
+        }
+        id === "correct" 
+        ? window.alert("正解！次に進みます") 
+        : window.alert(`残念！正解は${itemData.items[ansIndex].name}！ 次に進みます`)
         document.getElementById(id).style.display = "none";
         await setItemData();
         isStoppingComment = false;

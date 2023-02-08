@@ -11,6 +11,14 @@ app = FastAPI()
 
 dbname = 'item_data.db'
 
+def get_item_length():
+    conn = sqlite3.connect(dbname)
+    cur = conn.cursor()
+    cur.execute("SELECT COUNT(*) FROM name_pic")
+    result = cur.fetchone()[0]
+    cur.close()
+    conn.close()
+    return result
 
 
 def get_name_and_image(index:int):
@@ -21,6 +29,7 @@ def get_name_and_image(index:int):
     cur.close()
     conn.close()
     return list
+
 
 def get_reviews(id :str):
     conn = sqlite3.connect(dbname)
@@ -43,6 +52,20 @@ def rand_ints_nodup(a : int, b : int, k : int = 4):#重複しないランダム�
   return ns
 
 
+def getRank(score : float):
+    if score >= 5.5:
+        return "S"
+    if score >= 5.0:
+        return "A"
+    if score >= 4.0:
+        return "B"
+    if score >= 3.0:
+        return "C"
+    return "D"
+
+    
+
+
 
 templates = Jinja2Templates(directory="templates")
 
@@ -58,20 +81,37 @@ app.mount(
 
 
 @app.get("/")
-async def index(request:Request):
+async def start(request:Request):
     return templates.TemplateResponse("start_screen.html",{"request":request})
 
 
-@app.get("/index.html")
-async def index(request:Request):
-    return templates.TemplateResponse("index.html",{"request":request})
+@app.get("/game")
+async def start_game(request:Request):
+    return templates.TemplateResponse("game.html",{"request":request})
+
+
+@app.get("/result")
+async def show_result(request:Request,time : int,correctNum : int):
+    score : float = round(correctNum + (60 - time) / 60, 2)
+    rank : str = getRank(score)
+    return templates.TemplateResponse(
+        "result.html",
+        {
+         "request" : request,
+         "time" : time,
+         "correctNum" : correctNum,
+         "score": score,
+         "rank": rank
+        }
+    )
 
 
 
 
 @app.get("/quiz_data",response_model=schemas.QuizData)
 async def provide_quiz_data():
-    index_list = rand_ints_nodup(0,3)
+
+    index_list = rand_ints_nodup(0,get_item_length() - 1)
     item_list = []
     for index in index_list:
         name_and_image = get_name_and_image(index)

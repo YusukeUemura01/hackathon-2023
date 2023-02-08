@@ -248,6 +248,100 @@ button.button-80:nth-child(4){
   text-shadow: -1px -1px rgb(1, 17, 240), 1px -1px rgb(1, 17, 240),	-1px 1px rgb(1, 17, 240), 1px 1px rgb(1, 17, 240);
 }
 
+#result-score{
+  font-size: 450%;
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+}
+
+#result-rank{
+  font-size: 450%;
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#result-num{
+  font-size: 250%;
+  position: absolute;
+  top: 40%;
+  left: 40%;
+  transform: translate(-50%, -50%);
+}
+
+#result-time{
+  font-size: 250%;
+  position: absolute;
+  top: 40%;
+  left: 60%;
+  transform: translate(-50%, -50%);
+
+}
+
+#S{
+  color: blueviolet;
+  font-size: 200%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+
+#A{
+  color: red;
+  font-size: 200%;
+  position: absolute;
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#B{
+  color: orange;
+  font-size: 200%;
+  position: absolute;
+  top: 60%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#C{
+  color: greenyellow;
+  font-size: 200%;
+  position: absolute;
+  top: 65%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#D{
+  color: cyan;
+  font-size: 200%;
+  position: absolute;
+  top: 70%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+
+#start-bnt{
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+
+#end-bnt{
+  top: 85%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 /* 
 
 @keyframes lane0 {
