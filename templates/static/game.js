@@ -5,13 +5,28 @@ const $buttons = document.querySelectorAll(".button-80");
 const $question = document.getElementById("question");
 const $itemImages = document.querySelectorAll(".image");
 const $itemNames = document.querySelectorAll(".name");
-let ansIndex = 1;
+const $time = document.getElementById("time");
+const $correctAnsNum = document.getElementById("correct-count");
 
-let itemData;
+let ansIndex = 0;//正解番号
 
-let currentQuestionNum  = 0;
+let itemData;//商品データ
 
-let stopComment = false;
+let currentQuestionNum  = 0;//現在の問題番号
+
+let isStoppingComment = false;//コメントが止まっているかどうか
+
+let passedTime = 0;//経過時間
+
+let correctAnsNum = 0;//合計正解数
+
+let commentSpeed = -5;//コメントスピード
+
+let defaultPostion = 2000;//コメントのデフォルトポジション
+
+const correctAudio = new Audio("templates/static/correct.mp3");
+
+const inCorrectAudio = new Audio("templates/static/incorrect.mp3");
 
 
 
@@ -26,17 +41,17 @@ function getRandomInt(min, max) {
 
 
 
+
 function setCommentOnLane(lane) {
     reviewList = itemData.items[ansIndex].reviews;
     lane.textContent = reviewList[getRandomInt(0,reviewList.length - 1)];
 }
 
 
+
 async function fetchItemData() {
     const res = await fetch("http://127.0.0.1:8000/quiz_data");
     itemData = await res.json();
-    console.log(itemData);
-    console.log("fetch完了");
 };
 
 
@@ -52,6 +67,32 @@ function setItemImageAndName() {
         name.textContent = itemData.items[index].name;
     });
 }
+
+
+
+
+function setCorrectAnsNum(){
+    $correctAnsNum.textContent = `正解問題数 ${correctAnsNum}`;
+}
+
+
+
+function setTime(){
+    $time.textContent = `経過時間 ${passedTime}s`;
+}
+
+
+
+
+function countPassedTime () {
+    setInterval(function() {
+        if(isStoppingComment)return;
+        setTime();
+        passedTime++;
+      }, 1000);
+}
+
+
 
 
 
@@ -77,14 +118,7 @@ async function setItemData() {
 
 
 
-let commentSpeed = -5;
-
-let defaultPostion = 2000;
-
 function runComment() {
-
-
-
     $lanes.forEach((lane, index) => {
         let position = defaultPostion;
 
@@ -97,12 +131,11 @@ function runComment() {
             setCommentOnLane(lane);
           }
 
-          if(stopComment){
+          if(isStoppingComment){
             commentSpeed = 0;
             position = defaultPostion;
           }
         }
-
         moveComment();
       });
 }
@@ -115,7 +148,7 @@ function showDialog(id) {
         id === "correct" ? window.alert("正解！次に進みます") : window.alert(`残念！正解は${itemData.items[ansIndex].name}！ 次に進みます`)
         document.getElementById(id).style.display = "none";
         await setItemData();
-        stopComment = false;
+        isStoppingComment = false;
         commentSpeed = -5;
     },1000);
 }
@@ -128,20 +161,32 @@ function showDialog(id) {
 
 setItemData();
 
+setCorrectAnsNum();
+
+setTime();
+
 
 runComment();
+
+
+countPassedTime();
 
 
 
 for(let bntIndex=0; bntIndex < $buttons.length; bntIndex++) {
 
     $buttons[bntIndex].addEventListener('click',(e) => {
-        if(stopComment)return;
-        stopComment = true;
+        if(isStoppingComment)return;
+        isStoppingComment = true;
         if(bntIndex === ansIndex){
+            correctAnsNum++;
+            setCorrectAnsNum();
+            correctAudio.play();
             showDialog("correct");
         }else{
+            inCorrectAudio.play();
             showDialog("incorrect");
         }
     })
 }
+
